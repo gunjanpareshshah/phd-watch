@@ -1,0 +1,65 @@
+# Boards to watch, and how to spot a job ad on each one.
+#
+# link_pattern is a regex that job-ad URLs on that site match. Everything else
+# on the page (nav, footer, related links) gets ignored.
+#
+# filter: false means the URL is already narrowed by the site, so every ad on
+# it counts and the keyword test is skipped.
+
+include_keywords:
+  - phd
+  - doctoral
+  - doctorate
+  - stipendiat
+  - ph.d
+  - research fellow
+  - doktorand
+
+exclude_keywords:
+  - postdoc
+  - postdoctoral
+  - professor
+  - lecturer
+  - senior researcher
+  - administrator
+  - technician
+
+sources:
+  # Academic Positions, already filtered to PhD + media and communication.
+  - name: Academic Positions (PhD, media and comms)
+    url: https://academicpositions.com/jobs/position/phd/field/media-and-communication-studies
+    link_pattern: academicpositions\.com/ad/
+    filter: false
+
+  # Wider net on the same site: all positions in the field, keyword filter on.
+  - name: Academic Positions (all media and comms)
+    url: https://academicpositions.com/jobs/field/media-and-communication-studies
+    link_pattern: academicpositions\.com/ad/
+    filter: true
+
+  # Nordic board. Slower to update, but carries departmental ads the
+  # aggregators miss.
+  - name: NordMedia Network
+    url: https://nordmedianetwork.org/latest/vacant-positions/
+    link_pattern: nordmedianetwork\.org/latest/vacant-positions/[a-z0-9-]+/
+    filter: true
+
+  # All Dutch academic vacancies, searched on "media", newest first.
+  - name: AcademicTransfer
+    url: https://www.academictransfer.com/en/jobs/?vacancy_type=scientific&q=media&order=published
+    link_pattern: academictransfer\.com/en/jobs/\d+
+    filter: true
+
+  # Norway. Paste your own filtered search URL here from jobbnorge.no, then
+  # flip enabled to true. Jobbnorge search URLs are long but stable.
+  - name: Jobbnorge
+    url: https://www.jobbnorge.no/en/search
+    link_pattern: jobbnorge\.no/(en|nn-no)/(available-jobs|ledige-stillingar)/job/\d+
+    filter: true
+    enabled: false
+
+  # Add departmental boards here as you find them. Same three fields.
+  # - name: University of Southern Denmark
+  #   url: <paste the vacancy list URL>
+  #   link_pattern: <a fragment that only job ads contain>
+  #   filter: true
