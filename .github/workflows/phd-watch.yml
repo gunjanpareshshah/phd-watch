@@ -1,0 +1,55 @@
+name: PhD watch
+
+on:
+  schedule:
+    # 06:15 UTC on weekdays. That is 07:15 Irish time in summer, 06:15 in winter.
+    # GitHub queues cron jobs, so it can land up to 15 minutes late.
+    - cron: "15 6 * * 1-5"
+  workflow_dispatch:
+    inputs:
+      seed:
+        description: "Seed mode: mark everything currently live as already seen"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run watcher
+        env:
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          MAIL_TO: ${{ secrets.MAIL_TO }}
+        run: |
+          if [ "${{ inputs.seed }}" = "true" ]; then
+            python phd_watch.py --seed
+          else
+            python phd_watch.py
+          fi
+
+      - name: Commit results
+        run: |
+          git config user.name "phd-watch"
+          git config user.email "actions@github.com"
+          git add seen.json digests
+          if git diff --staged --quiet; then
+            echo "Nothing changed"
+          else
+            git commit -m "PhD watch: $(date -u +%Y-%m-%d)"
+            git push
+          fi
